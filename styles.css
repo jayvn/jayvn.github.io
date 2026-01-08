@@ -5,7 +5,7 @@
 }
 
 :root {
-    --primary-color: #1a1f2e;
+    --primary-color: #f1f5f9;
     --secondary-color: #64b5f6;
     --accent-color: #ff6b6b;
     --text-color: #e4e4e7;
@@ -423,7 +423,7 @@ main {
 
 /* Footer */
 .footer {
-    background-color: var(--primary-color);
+    background-color: #1a1f2e;
     color: var(--text-color);
     text-align: center;
     padding: 30px 20px;
@@ -516,6 +516,7 @@ html {
 
 /* Print styles */
 @media print {
+
     .nav,
     .footer {
         display: none;

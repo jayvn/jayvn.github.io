@@ -60,7 +60,7 @@ sections.forEach(section => {
 });
 
 // Add fade-in animation on scroll
-const fadeElements = document.querySelectorAll('.experience-item, .skill-category');
+const fadeElements = document.querySelectorAll('.experience-item, .skill-category, .project-card');
 
 const fadeObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {

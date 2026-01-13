@@ -52,9 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Determine filename: use 'file' property or default to id + .html
-            const filename = post.file || `${id}.html`;
-            const fileUrl = `blog/posts/${filename}`;
+            // Always fetch Markdown file
+            const fileUrl = `blog/posts/${id}.md`;
 
             const response = await fetch(fileUrl);
             if (!response.ok) {
@@ -65,27 +64,27 @@ document.addEventListener('DOMContentLoaded', () => {
                  throw new Error('Failed to load post content');
             }
 
-            let content = await response.text();
+            const content = await response.text();
 
-            // Check if Markdown
-            if (filename.endsWith('.md')) {
-                // Configure marked to handle relative image paths
-                // We assume images are located in blog/posts/ relative to the site root
-                const renderer = new marked.Renderer();
-                const originalImage = renderer.image.bind(renderer);
-                renderer.image = (href, title, text) => {
-                    // If the link is relative (doesn't start with http, https, or /)
-                    // prepend the blog posts directory
-                    if (href && !href.match(/^(http|https|\/)/)) {
-                        href = `blog/posts/${href}`;
-                    }
-                    return originalImage(href, title, text);
-                };
+            // Configure marked to handle relative image paths
+            // We assume images are located in blog/posts/ relative to the site root
+            const renderer = new marked.Renderer();
+            const originalImage = renderer.image.bind(renderer);
+            renderer.image = (href, title, text) => {
+                // If the link is relative (doesn't start with http, https, or /)
+                // prepend the blog posts directory
+                if (href && !href.match(/^(http|https|\/)/)) {
+                    href = `blog/posts/${href}`;
+                }
+                return originalImage(href, title, text);
+            };
 
-                // Parse Markdown
-                const htmlContent = marked.parse(content, { renderer: renderer });
+            // Parse Markdown
+            const htmlContent = marked.parse(content, { renderer: renderer });
 
-                content = `
+            blogContent.innerHTML = `
+                <div class="blog-post-container">
+                    <a href="blog.html" class="back-link">&larr; Back to Blog</a>
                     <article class="blog-post">
                         <h1>${post.title}</h1>
                         <p class="post-meta">Published on ${formatDate(post.date)}</p>
@@ -93,13 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${htmlContent}
                         </div>
                     </article>
-                `;
-            }
-
-            blogContent.innerHTML = `
-                <div class="blog-post-container">
-                    <a href="blog.html" class="back-link">&larr; Back to Blog</a>
-                    ${content}
                 </div>
             `;
         } catch (error) {

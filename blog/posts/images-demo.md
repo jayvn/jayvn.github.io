@@ -1,5 +1,3 @@
-# Pasting Images Demo
-
 This blog now supports Markdown!
 
 You can write your posts in `.md` files and they will be automatically rendered on the site.

@@ -41,15 +41,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadPost(id) {
         try {
-            const response = await fetch(`blog/posts/${id}.html`);
+            // Fetch the post manifest to find the file path
+            const listResponse = await fetch('blog/posts.json');
+            if (!listResponse.ok) throw new Error('Failed to load posts list');
+            const posts = await listResponse.json();
+            const post = posts.find(p => p.id === id);
+
+            if (!post) {
+                blogContent.innerHTML = '<p>Post not found.</p><a href="blog.html">&larr; Back to Blog</a>';
+                return;
+            }
+
+            // Determine filename: use 'file' property or default to id + .html
+            const filename = post.file || `${id}.html`;
+            const fileUrl = `blog/posts/${filename}`;
+
+            const response = await fetch(fileUrl);
             if (!response.ok) {
                  if (response.status === 404) {
-                     blogContent.innerHTML = '<p>Post not found.</p><a href="blog.html">&larr; Back to Blog</a>';
+                     blogContent.innerHTML = '<p>Post content not found.</p><a href="blog.html">&larr; Back to Blog</a>';
                      return;
                  }
-                 throw new Error('Failed to load post');
+                 throw new Error('Failed to load post content');
             }
-            const content = await response.text();
+
+            let content = await response.text();
+
+            // Check if Markdown
+            if (filename.endsWith('.md')) {
+                // Configure marked to handle relative image paths
+                // We assume images are located in blog/posts/ relative to the site root
+                const renderer = new marked.Renderer();
+                const originalImage = renderer.image.bind(renderer);
+                renderer.image = (href, title, text) => {
+                    // If the link is relative (doesn't start with http, https, or /)
+                    // prepend the blog posts directory
+                    if (href && !href.match(/^(http|https|\/)/)) {
+                        href = `blog/posts/${href}`;
+                    }
+                    return originalImage(href, title, text);
+                };
+
+                // Parse Markdown
+                const htmlContent = marked.parse(content, { renderer: renderer });
+
+                content = `
+                    <article class="blog-post">
+                        <h1>${post.title}</h1>
+                        <p class="post-meta">Published on ${formatDate(post.date)}</p>
+                        <div class="post-content">
+                            ${htmlContent}
+                        </div>
+                    </article>
+                `;
+            }
 
             blogContent.innerHTML = `
                 <div class="blog-post-container">

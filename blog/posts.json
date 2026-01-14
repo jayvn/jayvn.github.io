@@ -1,11 +1,5 @@
 [
     {
-        "id": "images-demo",
-        "title": "Pasting Images Demo",
-        "date": "2024-05-22",
-        "summary": "Demonstrating how to use Markdown to easily add images to your blog posts."
-    },
-    {
         "id": "welcome",
         "title": "Welcome to my Blog",
         "date": "2024-05-21",

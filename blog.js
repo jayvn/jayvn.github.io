@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Mobile menu toggle
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navList = document.querySelector('.nav-list');
+
+    if (mobileMenuToggle && navList) {
+        mobileMenuToggle.addEventListener('click', () => {
+            navList.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        const navLinks = document.querySelectorAll('.nav-list a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navList.classList.remove('active');
+            });
+        });
+    }
+
     const blogContent = document.getElementById('blog-content');
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('post');
